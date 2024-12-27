@@ -18,10 +18,7 @@
 
 ## AI Components
 - **Language Models**:
-  - OpenAI API/Claude
-  - LangChain (for AI orchestration)
-- **Vector Database**: 
-  - Pinecone (for efficient knowledge retrieval)
+  - Google Gemini API
 - **Custom Agents**:
   - ElementAgent
   - ReactionAgent
