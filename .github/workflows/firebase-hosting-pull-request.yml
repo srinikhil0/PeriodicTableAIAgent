@@ -10,6 +10,9 @@ permissions:
 jobs:
   build_and_preview:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: periodic-table-ai
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
