@@ -3,6 +3,8 @@ import { db } from '@/app/config/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { Element } from '@/types/elements';
 
+export const dynamic = 'force-static';
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');

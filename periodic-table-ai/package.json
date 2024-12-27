@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "firebase:emulators": "firebase emulators:start",
-    "build:prod": "next build && next export",
+    "build:prod": "next build",
     "deploy": "firebase deploy",
     "populate": "ts-node -P tsconfig.populate.json src/scripts/populateFirestore.ts"
   },
