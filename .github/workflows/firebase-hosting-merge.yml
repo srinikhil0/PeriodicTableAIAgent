@@ -30,7 +30,9 @@ jobs:
           echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> .env.local
           echo "NEXT_PUBLIC_GOOGLE_AI_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_AI_API_KEY }}" >> .env.local
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
+          cp -r periodic-table-ai/out .
       - name: Deploy
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
