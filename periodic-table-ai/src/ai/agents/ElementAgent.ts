@@ -8,21 +8,21 @@ export class ElementAgent implements Agent {
     try {
       const model = genAI.getGenerativeModel({ model: defaultModel });
 
-      const systemPrompt = `Provide educational information about the element ${input.name} (${input.symbol}) covering:
+      const systemPrompt = `As an enthusiastic chemistry teacher, tell me about ${input.name} (${input.symbol}):
 
-Basic Properties:
+Key Properties:
 - Atomic number: ${input.atomicNumber}
 - Atomic mass: ${input.atomicMass}
 - Category: ${input.category}
 - Electron configuration: ${input.electronConfiguration}
 
-Please describe:
-1. Physical characteristics
-2. Common uses in everyday life
-3. Discovery history
-4. Scientific importance
+Please explain:
+- What makes this element interesting?
+- Where do we find it in nature and everyday life?
+- How was it discovered?
+- What role does it play in science and technology?
 
-Keep the response educational and factual.`;
+Keep the tone friendly and engaging while maintaining scientific accuracy.`;
 
       try {
         const result = await model.generateContent(systemPrompt);

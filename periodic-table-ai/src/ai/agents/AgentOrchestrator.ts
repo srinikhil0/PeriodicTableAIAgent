@@ -3,6 +3,7 @@ import { ElementAgent } from './ElementAgent';
 import { FormulaAgent } from './FormulaAgent';
 import { ReactionAgent } from './ReactionAgent';
 import { Element } from '@/types/elements';
+import { genAI, defaultModel } from '../config/gemini';
 
 export class AgentOrchestrator {
   private elementAgent: ElementAgent;
@@ -25,5 +26,22 @@ export class AgentOrchestrator {
 
   async explainReaction(reactants: string[], products: string[]): Promise<AgentResponse> {
     return this.reactionAgent.query({ reactants, products });
+  }
+
+  async handleConversation(input: string): Promise<AgentResponse> {
+    const model = genAI.getGenerativeModel({ model: defaultModel });
+    const systemPrompt = `As a friendly chemistry tutor, respond to: "${input}"
+Keep the tone conversational and engaging while guiding the discussion towards chemistry topics.`;
+    
+    const result = await model.generateContent(systemPrompt);
+    return { content: result.response.text() };
+  }
+
+  async handleError(): Promise<AgentResponse> {
+    const model = genAI.getGenerativeModel({ model: defaultModel });
+    const systemPrompt = `Generate a friendly error message for a chemistry chatbot that encourages the user to try again.`;
+    
+    const result = await model.generateContent(systemPrompt);
+    return { content: result.response.text() };
   }
 }

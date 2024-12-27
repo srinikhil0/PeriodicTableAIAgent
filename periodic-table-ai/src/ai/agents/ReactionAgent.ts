@@ -12,18 +12,17 @@ export class ReactionAgent implements Agent {
     try {
       const model = genAI.getGenerativeModel({ model: defaultModel });
 
-      const systemPrompt = `Explain the chemical reaction:
+      const systemPrompt = `As a friendly chemistry tutor, explain this reaction in an engaging way:
 Reactants: ${input.reactants.join(' + ')}
 Products: ${input.products.join(' + ')}
 
-Please provide:
-1. Reaction type
-2. Balanced equation
-3. Reaction mechanism
-4. Energy changes
-5. Common applications
+Help the student understand:
+- What kind of reaction is happening here?
+- How do the molecules interact?
+- Where would we see this in real life?
+- What makes this reaction interesting?
 
-Keep the response educational and factual.`;
+Keep it conversational while being scientifically accurate, like explaining to a curious student.`;
 
       try {
         const result = await model.generateContent(systemPrompt);
