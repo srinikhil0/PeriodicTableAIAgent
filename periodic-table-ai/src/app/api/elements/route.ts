@@ -4,18 +4,10 @@ import { collection, getDocs } from 'firebase/firestore';
 import { Element } from '@/types/elements';
 import { getElementsByCategory, getElementById } from '@/utils/firebase';
 
-export const dynamic = 'error';
-export const dynamicParams = false;
+// For static export, we'll use static data generation
+export const dynamic = 'force-static';
 
-// Generate static params for all possible routes
-export async function generateStaticParams() {
-  const elements = await getAllElements();
-  const categories = [...new Set(elements.map(e => e.category))];
-  const ids = elements.map(e => e.atomicNumber.toString());
-  
-  return [...categories, ...ids];
-}
-
+// Function to get all elements at build time
 async function getAllElements() {
   const querySnapshot = await getDocs(collection(db, 'elements'));
   return querySnapshot.docs
@@ -23,21 +15,17 @@ async function getAllElements() {
     .sort((a, b) => a.atomicNumber - b.atomicNumber);
 }
 
-export async function GET(request: Request, { params }: { params: { id?: string, category?: string } }) {
+// Static data generation
+export async function generateStaticParams() {
+  const elements = await getAllElements();
+  return elements.map((element) => ({
+    id: element.atomicNumber.toString(),
+  }));
+}
+
+// GET handler for static paths
+export async function GET() {
   try {
-    if (params.id) {
-      const element = await getElementById(params.id);
-      if (element) {
-        return NextResponse.json(element);
-      }
-      return NextResponse.json({ error: 'Element not found' }, { status: 404 });
-    }
-
-    if (params.category) {
-      const elements = await getElementsByCategory(params.category);
-      return NextResponse.json(elements);
-    }
-
     const elements = await getAllElements();
     return NextResponse.json(elements);
   } catch (error) {
