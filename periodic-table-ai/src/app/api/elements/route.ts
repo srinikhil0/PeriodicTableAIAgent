@@ -1,36 +1,44 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/config/firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { Element } from '@/types/elements';
+import { getElementsByCategory, getElementById } from '@/utils/firebase';
 
-export const dynamic = 'force-static';
+export const dynamic = 'error';
+export const dynamicParams = false;
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  const category = searchParams.get('category');
+// Generate static params for all possible routes
+export async function generateStaticParams() {
+  const elements = await getAllElements();
+  const categories = [...new Set(elements.map(e => e.category))];
+  const ids = elements.map(e => e.atomicNumber.toString());
+  
+  return [...categories, ...ids];
+}
 
+async function getAllElements() {
+  const querySnapshot = await getDocs(collection(db, 'elements'));
+  return querySnapshot.docs
+    .map(doc => doc.data() as Element)
+    .sort((a, b) => a.atomicNumber - b.atomicNumber);
+}
+
+export async function GET(request: Request, { params }: { params: { id?: string, category?: string } }) {
   try {
-    let elements: Element[] = [];
-    
-    if (id) {
-      const docRef = doc(db, 'elements', id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        return NextResponse.json(docSnap.data());
+    if (params.id) {
+      const element = await getElementById(params.id);
+      if (element) {
+        return NextResponse.json(element);
       }
       return NextResponse.json({ error: 'Element not found' }, { status: 404 });
     }
 
-    const querySnapshot = await getDocs(collection(db, 'elements'));
-    elements = querySnapshot.docs
-      .map(doc => doc.data() as Element)
-      .sort((a, b) => a.atomicNumber - b.atomicNumber);
-
-    if (category) {
-      elements = elements.filter(element => element.category === category);
+    if (params.category) {
+      const elements = await getElementsByCategory(params.category);
+      return NextResponse.json(elements);
     }
 
+    const elements = await getAllElements();
     return NextResponse.json(elements);
   } catch (error) {
     console.error('Error fetching elements:', error);
