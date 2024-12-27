@@ -5,6 +5,14 @@ const config: NextConfig = {
   distDir: 'out',
   images: {
     unoptimized: true
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/favicon/:path*',
+        destination: '/public/favicon/:path*'
+      }
+    ];
   }
 };
 
