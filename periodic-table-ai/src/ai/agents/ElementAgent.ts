@@ -5,26 +5,29 @@ import { Element } from '@/types/elements';
 import { RSCClient } from '@/api/rsc/client';
 
 export class ElementAgent implements Agent {
-  private rscClient: RSCClient;
+  private rscClient: RSCClient | null = null;
 
   constructor() {
-    if (!process.env.NEXT_PUBLIC_RSC_API_KEY) {
-      throw new Error('NEXT_PUBLIC_RSC_API_KEY is not configured');
+    // Try to initialize RSC client, but don't throw if key is missing
+    if (process.env.NEXT_PUBLIC_RSC_API_KEY) {
+      this.rscClient = new RSCClient(process.env.NEXT_PUBLIC_RSC_API_KEY);
     }
-    this.rscClient = new RSCClient(process.env.NEXT_PUBLIC_RSC_API_KEY);
   }
 
   async query(input: Element): Promise<AgentResponse> {
     try {
       let rscData = {};
-      try {
-        rscData = await this.rscClient.getElementData(input.symbol);
-      } catch (rscError) {
-        console.warn('RSC API error:', rscError);
+      // Only try to fetch RSC data if client is initialized
+      if (this.rscClient) {
+        try {
+          rscData = await this.rscClient.getElementData(input.symbol);
+        } catch (rscError) {
+          console.warn('RSC API error:', rscError);
+        }
       }
       
       const model = genAI.getGenerativeModel({ model: defaultModel });
-      const systemPrompt = `As a chemistry expert with access to Royal Society of Chemistry data, explain ${input.name} (${input.symbol}):
+      const systemPrompt = `As a chemistry expert with access to element data, explain ${input.name} (${input.symbol}):
 
 Key Properties:
 - Atomic number: ${input.atomicNumber}
@@ -32,8 +35,7 @@ Key Properties:
 - Category: ${input.category}
 - Electron configuration: ${input.electronConfiguration}
 
-RSC Additional Data:
-${JSON.stringify(rscData, null, 2)}
+${this.rscClient ? 'RSC Additional Data:\n' + JSON.stringify(rscData, null, 2) : ''}
 
 Please provide a comprehensive explanation including:
 - Physical and chemical properties
