@@ -8,16 +8,22 @@ export class ElementAgent implements Agent {
   private rscClient: RSCClient;
 
   constructor() {
-    this.rscClient = new RSCClient(process.env.RSC_API_KEY!);
+    if (!process.env.NEXT_PUBLIC_RSC_API_KEY) {
+      throw new Error('NEXT_PUBLIC_RSC_API_KEY is not configured');
+    }
+    this.rscClient = new RSCClient(process.env.NEXT_PUBLIC_RSC_API_KEY);
   }
 
   async query(input: Element): Promise<AgentResponse> {
     try {
-      // Get additional data from RSC
-      const rscData = await this.rscClient.getElementData(input.symbol);
+      let rscData = {};
+      try {
+        rscData = await this.rscClient.getElementData(input.symbol);
+      } catch (rscError) {
+        console.warn('RSC API error:', rscError);
+      }
       
       const model = genAI.getGenerativeModel({ model: defaultModel });
-
       const systemPrompt = `As a chemistry expert with access to Royal Society of Chemistry data, explain ${input.name} (${input.symbol}):
 
 Key Properties:
@@ -37,26 +43,29 @@ Please provide a comprehensive explanation including:
 - Recent research developments
 - Historical significance
 
-Use the RSC data to ensure accuracy while keeping the explanation engaging and educational.`;
+Format the response with clear section headers and bullet points where appropriate.
+Use proper spacing and line breaks between sections for readability.`;
 
       const result = await model.generateContent(systemPrompt);
       const response = await result.response;
       const text = response.text()
+        // Remove markdown formatting
         .replace(/[*#]/g, '')
-        .replace(/\s+/g, ' ')
-        .replace(/\./g, '. ')
-        .replace(/\s+/g, ' ')
-        .replace(/([A-Z][a-z]+):/g, '\n\n$1:\n')
+        // Add proper spacing after periods
+        .replace(/\./g, '.\n')
+        // Format section headers
+        .replace(/([A-Z][a-z]+(?: [A-Z][a-z]+)*:)/g, '\n\n$1\n')
+        // Format bullet points
         .replace(/•/g, '\n• ')
+        // Clean up multiple line breaks
         .replace(/\n{3,}/g, '\n\n')
+        // Add extra space before section headers
+        .replace(/\n([A-Z][a-z]+(?: [A-Z][a-z]+)*:)/g, '\n\n$1')
         .trim();
 
       return {
         content: text,
-        sources: [
-          `Element: ${input.name}`,
-          'Royal Society of Chemistry Database'
-        ]
+        sources: [`Element: ${input.name} (${input.symbol})`]
       };
 
     } catch (error) {

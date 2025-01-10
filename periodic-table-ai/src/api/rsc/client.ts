@@ -21,8 +21,11 @@ export class RSCClient {
 
   async getElementData(symbol: string) {
     const response = await axios.get(
-      `${RSC_API_BASE_URL}/elements/${symbol}`,
-      { headers: this.headers }
+      `${RSC_API_BASE_URL}/periodic-table/element/${symbol}`,
+      { 
+        headers: this.headers,
+        timeout: 5000  // Add timeout to handle network issues
+      }
     );
     return response.data;
   }

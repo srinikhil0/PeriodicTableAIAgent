@@ -23,7 +23,10 @@ if (!admin.apps.length) {
 const adminDb = admin.firestore();
 
 export async function syncRSCData() {
-  const rscClient = new RSCClient(process.env.RSC_API_KEY!);
+  if (!process.env.RSC_API_KEY) {
+    throw new Error('RSC_API_KEY is not configured');
+  }
+  const rscClient = new RSCClient(process.env.RSC_API_KEY);
   const batch = adminDb.batch();
 
   for (const element of elements) {
