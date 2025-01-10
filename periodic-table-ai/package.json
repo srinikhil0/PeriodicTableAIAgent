@@ -10,13 +10,16 @@
     "firebase:emulators": "firebase emulators:start",
     "build:prod": "next build",
     "deploy": "firebase deploy",
-    "populate": "ts-node -P tsconfig.populate.json src/scripts/populateFirestore.ts"
+    "populate": "ts-node -P tsconfig.populate.json src/scripts/populateFirestore.ts",
+    "sync:rsc": "ts-node -P tsconfig.populate.json src/scripts/syncRSCData.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@headlessui/react": "^2.2.0",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0",
     "firebase": "^11.1.0",
     "framer-motion": "^11.15.0",
     "next": "15.1.3",
