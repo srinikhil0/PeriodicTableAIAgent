@@ -8,6 +8,32 @@ This project is developed in collaboration with:
 - **MXEnergy Labs**
 - **Shizuoka University, Japan**
 
+## 🧠 Custom LLM Development
+
+The project aims to develop a specialized Large Language Model focused on material sciences and chemistry with the following capabilities:
+
+**Expertise Areas:**
+- Advanced material science concepts
+- Chemical reactions and mechanisms
+- Crystal structures and properties
+- Quantum chemistry
+- Materials characterization techniques
+- Industrial applications and processes
+
+**Technical Requirements:**
+- High-performance computing infrastructure (GPU clusters)
+- Specialized chemistry and materials science dataset
+- Domain-specific training architecture
+- Advanced validation frameworks
+
+**Dataset Requirements:**
+- Scientific papers and journals
+- Chemistry textbooks and reference materials
+- Materials databases
+- Experimental data
+- Industrial process documentation
+- Research publications from collaborating institutions
+
 ## 🌟 Features
 
 - **Interactive Periodic Table**: A visually appealing and responsive periodic table interface
